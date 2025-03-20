@@ -49,7 +49,6 @@ import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.inventory.meta.CrossbowMeta;
-import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -215,7 +214,7 @@ public class ArcherySkill extends Skill implements Listener {
         }
         e.setDamage(damage);
 
-        ValhallaMMO.getInstance().getServer().getScheduler().runTaskLater(ValhallaMMO.getInstance(), () -> {
+        Scheduling.runTaskLater(ValhallaMMO.getInstance(), () -> {
             if (e.isCancelled() || !p.isOnline()) return;
             double chunkNerf = ChunkEXPNerf.getChunkEXPNerf(v.getLocation().getChunk(), p, "archery");
             double entityExpMultiplier = entityExpMultipliers.getOrDefault(v.getType(), 1D);
@@ -262,7 +261,7 @@ public class ArcherySkill extends Skill implements Listener {
             if (user.noGravity) {
                 a.setGravity(false);
                 // make charged shot disappear after 10 seconds to prevent arrows staying in the air forever
-                new BukkitRunnable(){
+                new ValhallaRunnable(){
                     @Override
                     public void run() {
                         e.getProjectile().remove();
@@ -274,13 +273,13 @@ public class ArcherySkill extends Skill implements Listener {
             if (chargedShotSonicBoomAnimation != null && a.getVelocity().lengthSquared() >= sonicBoomRequiredVelocity) chargedShotSonicBoomAnimation.animate(p, p.getEyeLocation(), p.getEyeLocation().getDirection(), 0);
             if (trail != null) AnimationUtils.trailProjectile(a, trail == Particle.valueOf(oldOrNew("REDSTONE", "DUST")) ? new RedstoneParticle(trailOptions) : new GenericParticle(trail), 60);
             if (user.crossbowInstantReload && bow.getType() == Material.CROSSBOW){
-                ValhallaMMO.getInstance().getServer().getScheduler().runTaskLater(ValhallaMMO.getInstance(), () -> {
+                Scheduling.runEntityTask(ValhallaMMO.getInstance(), p, 1L, () -> {
                     boolean mainHand = !ItemUtils.isEmpty(p.getInventory().getItemInMainHand()) && p.getInventory().getItemInMainHand().getType() == Material.CROSSBOW;
                     ItemStack crossbow = mainHand ? p.getInventory().getItemInMainHand() : p.getInventory().getItemInOffHand();
                     if (ItemUtils.isEmpty(crossbow) || !(crossbow.getItemMeta() instanceof CrossbowMeta crossbowMeta)) return;
                     crossbowMeta.addChargedProjectile(consumable);
                     crossbow.setItemMeta(crossbowMeta);
-                }, 1L);
+                });
             }
         } else {
             chargedShotUsers.remove(p.getUniqueId());

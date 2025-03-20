@@ -9,10 +9,7 @@ import me.athlaeos.valhallammo.item.item_attributes.AttributeWrapper;
 import me.athlaeos.valhallammo.playerstats.AccumulativeStatManager;
 import me.athlaeos.valhallammo.playerstats.EntityCache;
 import me.athlaeos.valhallammo.playerstats.EntityProperties;
-import me.athlaeos.valhallammo.utility.EntityUtils;
-import me.athlaeos.valhallammo.utility.ItemUtils;
-import me.athlaeos.valhallammo.utility.Parryer;
-import me.athlaeos.valhallammo.utility.Timer;
+import me.athlaeos.valhallammo.utility.*;
 import org.bukkit.FluidCollisionMode;
 import org.bukkit.Location;
 import org.bukkit.attribute.Attribute;
@@ -84,8 +81,8 @@ public class InteractListener implements Listener {
                         EntityUtils.removeUniqueAttribute(e.getPlayer(), "valhalla_dual_wield_attack_speed_offset", Attribute.GENERIC_ATTACK_SPEED);
                         swapHands(e.getPlayer());
 
-                        ValhallaMMO.getInstance().getServer().getScheduler().runTaskLater(ValhallaMMO.getInstance(), () ->
-                            attackedWithOffhand.remove(e.getPlayer().getUniqueId()), 2L);
+                        Scheduling.runTaskLater(ValhallaMMO.getInstance(), 2L, () ->
+                            attackedWithOffhand.remove(e.getPlayer().getUniqueId()));
                     }
                 }
             }
